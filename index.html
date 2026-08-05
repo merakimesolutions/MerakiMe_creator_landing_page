@@ -102,6 +102,7 @@ h1,h2,h3,h4{font-family:var(--font-display);line-height:1.18;letter-spacing:-.01
 .est-budget label{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;color:var(--ink-soft);margin-bottom:8px}
 .est-budget label span{color:var(--purple);font-weight:800;font-size:15px}
 input[type=range]{width:100%;accent-color:var(--purple);height:6px}
+.est-ticks{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px;padding:0 2px}
 .est-results{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
 .est-cell{background:var(--bg-soft);border:1px solid var(--line);border-radius:13px;padding:13px 15px}
 .est-cell .k{font-size:11.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
@@ -307,12 +308,11 @@ input[type=range]{width:100%;accent-color:var(--purple);height:6px}
       </div>
       <div class="est-budget">
         <label>Campaign budget <span id="budgetVal">$300</span></label>
-        <input type="range" id="budget" min="150" max="2000" step="50" value="300" aria-label="Campaign budget in US dollars">
+        <input type="range" id="budget" min="0" max="4" step="1" value="1" aria-label="Campaign budget tier">
+        <div class="est-ticks" aria-hidden="true"><span>$150</span><span>$300</span><span>$600</span><span>$750</span><span>$1,050</span></div>
       </div>
       <div class="est-results">
         <div class="est-cell hot"><div class="k">Estimated Views</div><div class="v" id="rViews"></div></div>
-        <div class="est-cell"><div class="k">Bonus Views (30%)</div><div class="v" id="rBonus"></div></div>
-        <div class="est-cell"><div class="k">Total Views</div><div class="v" id="rTotal"></div></div>
         <div class="est-cell"><div class="k">New Subscribers</div><div class="v" id="rSubs"></div></div>
       </div>
 
@@ -326,7 +326,7 @@ input[type=range]{width:100%;accent-color:var(--purple);height:6px}
         <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
         <input type="email" name="email" id="fEmail" placeholder="Your email address" required aria-label="Email address">
         <div class="row2">
-          <select name="country" required aria-label="Target country">
+          <select name="country" id="countrySelect" required aria-label="Target country">
             <option value="" disabled selected>Target country</option>
             <option>United States</option>
             <option>United Kingdom</option>
@@ -349,6 +349,7 @@ input[type=range]{width:100%;accent-color:var(--purple);height:6px}
         <div class="form-msg" id="formMsg" role="status"></div>
       </form>
       <p class="est-note">Estimates based on average delivery across our campaigns. Actuals vary by niche, targeting, and video quality.</p>
+      <p class="est-note">Subscriber figures are an estimate, not a guarantee. As we promote to real people, subscribing is at the viewer's discretion &mdash; we don't have any direct control over it.</p>
     </div>
   </div>
 </header>
@@ -837,47 +838,54 @@ input[type=range]{width:100%;accent-color:var(--purple);height:6px}
   "use strict";
 
   /* ---------- Growth estimator ----------
-     Anchors (minimum committed global views):
-       $150 -> 20,000 | $300 -> 60,000 | $500 -> 105,000
-     Displayed estimate sits below commitment: low = 85%, high = 97%. */
-  function commitViews(b){
-    if(b <= 300) return 20000 + (b - 150) * (40000 / 150);
-    if(b <= 500) return 60000 + (b - 300) * 225;
-    return 105000 + (b - 500) * 210;
-  }
-  var SUB_LOW = 0.0028, SUB_HIGH = 0.0045;
+     Five fixed pricing tiers. "global" = Global/Other targeting, "country" =
+     US/UK/Canada/Australia targeting. Each tier's estimated views range runs
+     from the base delivered views up to base + a tiered bonus (3% on the
+     lowest tier, rising to 21% on the top tier) — no separate bonus figure
+     is shown, it's folded into the upper end of the range.
+     New-subscriber estimate uses a tiered rate from 0.45% (lowest tier) up
+     to 0.72% (top tier) of views, applied across the same low/high range. */
+  var TIERS = [
+    { budget: 150,  global: 15000,  country: 1500,  bonusPct: 0.030, subPct: 0.00450 },
+    { budget: 300,  global: 30000,  country: 3000,  bonusPct: 0.075, subPct: 0.005175 },
+    { budget: 600,  global: 60000,  country: 6000,  bonusPct: 0.120, subPct: 0.00585 },
+    { budget: 750,  global: 75000,  country: 7500,  bonusPct: 0.165, subPct: 0.006525 },
+    { budget: 1050, global: 105000, country: 10500, bonusPct: 0.210, subPct: 0.00720 }
+  ];
+  var TARGET_COUNTRIES = ["United States", "United Kingdom", "Canada", "Australia"];
+
   var budget = document.getElementById("budget");
   var budgetVal = document.getElementById("budgetVal");
   var rViews = document.getElementById("rViews");
-  var rBonus = document.getElementById("rBonus");
-  var rTotal = document.getElementById("rTotal");
   var rSubs = document.getElementById("rSubs");
   var fBudget = document.getElementById("fBudget");
   var fViews = document.getElementById("fViews");
+  var countrySelect = document.getElementById("countrySelect");
   var currentUrl = "";
 
   function fmt(n){
-    if(n >= 1000){
+    if(n >= 10000){
       var k = n / 1000;
-      var s = k >= 100 ? k.toFixed(1) : k.toFixed(1);
+      var s = k.toFixed(1);
       return s.replace(/\.0$/, "") + "K";
     }
-    return Math.round(n).toString();
+    return Math.round(n).toLocaleString();
   }
   function calc(){
-    var b = parseInt(budget.value, 10);
-    budgetVal.textContent = "$" + b;
-    var c = commitViews(b);
-    var vLow = c * 0.85, vHigh = c * 0.97;
-    var bLow = vLow * 0.3, bHigh = vHigh * 0.3;
+    var tier = TIERS[parseInt(budget.value, 10)];
+    budgetVal.textContent = "$" + tier.budget.toLocaleString();
+
+    var isTargetCountry = TARGET_COUNTRIES.indexOf(countrySelect.value) !== -1;
+    var base = isTargetCountry ? tier.country : tier.global;
+    var vLow = base, vHigh = base * (1 + tier.bonusPct);
+
     rViews.textContent = fmt(vLow) + " – " + fmt(vHigh);
-    rBonus.textContent = fmt(bLow) + " – " + fmt(bHigh);
-    rTotal.textContent = fmt(vLow + bLow) + " – " + fmt(vHigh + bHigh);
-    rSubs.textContent = Math.round(vLow * SUB_LOW) + " – " + Math.round(vHigh * SUB_HIGH);
-    fBudget.value = "$" + b;
+    rSubs.textContent = Math.round(vLow * tier.subPct) + " – " + Math.round(vHigh * tier.subPct);
+    fBudget.value = "$" + tier.budget;
     fViews.value = fmt(vLow) + " - " + fmt(vHigh);
   }
   budget.addEventListener("input", calc);
+  countrySelect.addEventListener("change", calc);
   calc();
 
   /* Parse a YouTube URL client-side and show the real thumbnail */
