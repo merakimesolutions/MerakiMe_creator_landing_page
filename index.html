@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Merakime | Signal-Based Real Estate Leads for US Realtors</title>
-  <meta name="description" content="Merakime finds real people who have publicly said they are buying, selling, or moving to your market. Get a free sample list built around your market." />
+  <title>Merakime Solutions | Quality Signal-Based Leads for Realtors in the US, Canada & UK</title>
+  <meta name="description" content="Merakime Solutions helps realtors find quality leads in the US, Canada, and UK from real people publicly announcing they are buying, selling, or moving." />
 
   <!-- Google Fonts: Lexend Deca & Work Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -68,7 +68,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    img {
+    img, svg {
       max-width: 100%;
       display: block;
     }
@@ -156,6 +156,7 @@
       cursor: pointer;
       transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
       text-decoration: none;
+      white-space: nowrap;
     }
 
     .btn-cta:hover {
@@ -190,7 +191,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background-color: rgba(255, 253, 245, 0.94);
+      background-color: rgba(255, 253, 245, 0.96);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border-light);
     }
@@ -199,33 +200,82 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 76px;
+      gap: 20px;
+      padding: 14px 0;
     }
 
-    .logo {
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--rich-black);
+      text-decoration: none;
+    }
+
+    .brand-lockup:hover {
+      opacity: 1;
+    }
+
+    /* Stacked MerakiMe wordmark with custom SVG logo mark underneath */
+    .logo-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .logo-wordmark {
       font-family: var(--font-heading);
       font-weight: 700;
-      font-size: 24px;
-      color: var(--rich-black);
+      font-size: 20px;
+      line-height: 1;
       letter-spacing: -0.03em;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
+      color: var(--rich-black);
     }
 
-    .logo-mark {
-      width: 14px;
-      height: 14px;
-      border-radius: 4px;
+    .logo-wordmark span {
       background: var(--brand-gradient);
-      display: inline-block;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 36px;
+      background-color: var(--border-light);
+      flex-shrink: 0;
+    }
+
+    .header-tagline-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .header-title {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 15px;
+      line-height: 1.25;
+      color: var(--rich-black);
+    }
+
+    .header-subtitle {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 13.5px;
+      line-height: 1.3;
+      color: var(--text-muted);
     }
 
     /* ==========================================================================
        4. HERO (Section 2)
        ========================================================================== */
     .hero {
-      padding: 96px 0 84px;
+      padding: 92px 0 84px;
       position: relative;
       overflow: hidden;
     }
@@ -457,15 +507,6 @@
       border-radius: 6px;
     }
 
-    .opener-box {
-      background: #F6F8FF;
-      border-left: 3px solid var(--electric-blue);
-      padding: 12px 16px;
-      border-radius: 0 8px 8px 0;
-      font-size: 15.5px;
-      color: var(--rich-black);
-    }
-
     .sample-caption {
       margin-top: 22px;
     }
@@ -500,6 +541,7 @@
       padding: 16px 22px;
       border-bottom: 1px solid var(--border-light);
       font-size: 16px;
+      vertical-align: middle;
     }
 
     .data-table tbody tr:last-child td {
@@ -594,24 +636,48 @@
     }
 
     /* ==========================================================================
-       12. MONTHLY PACKAGES (Section 10 - Optional)
+       12. MONTHLY PACKAGES (Section 10 - Aligned Table Layout)
        ========================================================================== */
-    .packages-table th,
-    .packages-table td {
-      text-align: center;
+    .packages-table {
+      table-layout: fixed;
+      min-width: 680px;
     }
 
-    .packages-table th:first-child,
-    .packages-table td:first-child {
+    .packages-table col.col-feature {
+      width: 34%;
+    }
+
+    .packages-table col.col-tier {
+      width: 22%;
+    }
+
+    .packages-table thead th,
+    .packages-table tbody td {
       text-align: left;
+      vertical-align: top;
+      padding: 18px 22px;
+    }
+
+    .packages-table thead th:not(:first-child),
+    .packages-table tbody td:not(:first-child) {
+      border-left: 1px solid var(--border-light);
+    }
+
+    .packages-table thead th:not(:first-child) {
+      border-left-color: var(--dark-border);
+    }
+
+    .packages-table tbody td:first-child {
       font-family: var(--font-heading);
       font-weight: 500;
+      color: var(--rich-black);
     }
 
     .packages-lead-count {
       font-family: var(--font-heading);
       font-weight: 600;
       font-size: 24px;
+      line-height: 1.2;
       color: var(--electric-blue);
     }
 
@@ -891,6 +957,31 @@
       .cards-3 {
         grid-template-columns: 1fr;
       }
+
+      .header-subtitle {
+        font-size: 12.5px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .header-inner {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .header-divider {
+        display: none;
+      }
+
+      .brand-lockup {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+
+      .logo-stack {
+        align-items: flex-start;
+      }
     }
 
     @media (max-width: 640px) {
@@ -939,10 +1030,32 @@
        ======================================================================== -->
   <header class="site-header">
     <div class="container header-inner">
-      <a href="#" class="logo">
-        <span class="logo-mark" aria-hidden="true"></span>
-        Merakime
+      <a href="#" class="brand-lockup" aria-label="MerakiMe Solutions Home">
+        <!-- MerakiMe wordmark with custom brand SVG logo underneath -->
+        <div class="logo-stack">
+          <span class="logo-wordmark">Meraki<span>Me</span></span>
+          <svg width="42" height="18" viewBox="0 0 84 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="merakimeGrad" x1="0" y1="36" x2="84" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#1340DF" />
+                <stop offset="50%" stop-color="#651DC2" />
+                <stop offset="100%" stop-color="#FBBF30" />
+              </linearGradient>
+            </defs>
+            <!-- Stylized geometric M + signal wave bar following the 45-degree brand gradient -->
+            <path d="M8 29V9L25 22L42 9L59 22L76 9V29" stroke="url(#merakimeGrad)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="42" cy="28" r="3.5" fill="#FBBF30" />
+          </svg>
+        </div>
+
+        <span class="header-divider" aria-hidden="true"></span>
+
+        <div class="header-tagline-group">
+          <span class="header-title">Merakime Solutions</span>
+          <span class="header-subtitle">Helping realtors find quality leads in the US, Canada, and UK</span>
+        </div>
       </a>
+
       <a href="#sample-form" class="btn-cta btn-cta--sm">Get free sample leads</a>
     </div>
   </header>
@@ -955,7 +1068,7 @@
     <section class="hero">
       <div class="container">
         <div class="hero-content">
-          <span class="hero-badge">Signal-Based Lead Generation for US Realtors</span>
+          <span class="hero-badge">Signal-Based Lead Generation &bull; US, Canada &amp; UK</span>
           <!-- Alternate headlines to test:
                1. "Stop searching social media for leads. We already did."
                2. "Leads from people who said it out loud."
@@ -1032,8 +1145,8 @@
 
     <!-- ======================================================================
          SECTION 6: WHAT A LEAD LOOKS LIKE
-         NOTE: Replace the illustrative placeholders ([date], [town], [Name],
-               [group]) with a real, redacted lead before launch.
+         NOTE: Replace the illustrative placeholders ([date], [time], [town])
+               with a real, redacted lead before launch.
          ====================================================================== -->
     <section class="sample-section">
       <div class="container">
@@ -1056,7 +1169,7 @@
               </tr>
               <tr>
                 <th>Posted</th>
-                <td>[date]</td>
+                <td>[date] at [time]</td>
               </tr>
               <tr>
                 <th>What they said</th>
@@ -1069,14 +1182,6 @@
               <tr>
                 <th>Profile link</th>
                 <td><a href="#sample-form" class="lead-link-chip">View profile &rarr;</a></td>
-              </tr>
-              <tr>
-                <th>Suggested opener</th>
-                <td>
-                  <div class="opener-box">
-                    "Hi [Name], saw your post in [group] about moving to [town]. I help families relocating there and I am happy to share what I would look at for commute and neighborhoods."
-                  </div>
-                </td>
               </tr>
             </tbody>
           </table>
@@ -1195,7 +1300,7 @@
     </section>
 
     <!-- ======================================================================
-         SECTION 10: MONTHLY PACKAGES (OPTIONAL)
+         SECTION 10: MONTHLY PACKAGES (Aligned columns)
          NOTE: You can delete this entire <section> if you prefer to quote
                strictly after delivering the free sample.
          ====================================================================== -->
@@ -1204,9 +1309,15 @@
         <h2>Simple monthly packages</h2>
         <div class="table-wrap">
           <table class="data-table packages-table">
+            <colgroup>
+              <col class="col-feature" />
+              <col class="col-tier" />
+              <col class="col-tier" />
+              <col class="col-tier" />
+            </colgroup>
             <thead>
               <tr>
-                <th></th>
+                <th>Package details</th>
                 <th>Starter</th>
                 <th>Growth</th>
                 <th>Scale</th>
@@ -1291,10 +1402,12 @@
             <summary>Is there a contract?</summary>
             <div class="faq-answer">No. Packages are billed monthly in advance and you can stop any month.</div>
           </details>
+          <!-- HIDDEN FOR NOW: Uncomment when ready to offer Paid Ads, SEO, Content & Influencer Marketing
           <details class="faq-item">
             <summary>Do you offer anything besides leads?</summary>
-            <div class="faq-answer">Yes. We also run paid ads, websites and SEO, content and influencer marketing for realtors. Tick the box in the form and we will include it in the conversation.</div>
+            <div class="faq-answer">Yes. We also run paid ads, websites and SEO, content and influencer marketing for realtors.</div>
           </details>
+          -->
         </div>
       </div>
     </section>
@@ -1346,7 +1459,7 @@
               <!-- 5. Your market (required) -->
               <div class="form-group full-width">
                 <label class="form-label" for="market">Your market: city, county or ZIP codes <span class="required-star">*</span></label>
-                <input class="form-input" type="text" id="market" name="market" placeholder="e.g., Marin County, CA or 94941, 94920" required />
+                <input class="form-input" type="text" id="market" name="market" placeholder="e.g., New York, NY or 10001, 10011" required />
               </div>
 
               <!-- 6. What do you mainly work on? -->
@@ -1358,23 +1471,6 @@
                   <label class="checkbox-pill"><input type="checkbox" name="focus[]" value="Rentals" /> Rentals</label>
                   <label class="checkbox-pill"><input type="checkbox" name="focus[]" value="Land and plots" /> Land and plots</label>
                   <label class="checkbox-pill"><input type="checkbox" name="focus[]" value="Commercial" /> Commercial</label>
-                </div>
-              </div>
-
-              <!-- 7. Anything we should filter out? (optional) -->
-              <div class="form-group full-width">
-                <label class="form-label" for="filters">Anything we should filter out? <span class="optional-tag">(optional)</span></label>
-                <input class="form-input" type="text" id="filters" name="filters" placeholder="e.g., Exclude renters, investors, or homes under $500k" />
-              </div>
-
-              <!-- 8. Also interested in (optional) -->
-              <div class="form-group full-width">
-                <span class="form-label">Also interested in <span class="optional-tag">(optional)</span></span>
-                <div class="checkbox-grid">
-                  <label class="checkbox-pill"><input type="checkbox" name="other_services[]" value="Paid ads" /> Paid ads</label>
-                  <label class="checkbox-pill"><input type="checkbox" name="other_services[]" value="Website and SEO" /> Website and SEO</label>
-                  <label class="checkbox-pill"><input type="checkbox" name="other_services[]" value="Content" /> Content</label>
-                  <label class="checkbox-pill"><input type="checkbox" name="other_services[]" value="Influencer marketing" /> Influencer marketing</label>
                 </div>
               </div>
             </div>
