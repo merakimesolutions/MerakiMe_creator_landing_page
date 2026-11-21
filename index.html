@@ -1067,36 +1067,6 @@
       margin-bottom: 28px;
     }
 
-    /* Locked read-only email field with lock icon */
-    .readonly-input-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .form-input--locked {
-      background-color: #F4F1E6;
-      color: var(--text-muted);
-      cursor: default;
-      padding-right: 44px;
-      user-select: all;
-    }
-
-    .form-input--locked:focus {
-      border-color: #CFCBB9;
-      box-shadow: none;
-      background-color: #F4F1E6;
-    }
-
-    .lock-icon {
-      position: absolute;
-      right: 14px;
-      width: 18px;
-      height: 18px;
-      color: var(--text-muted);
-      pointer-events: none;
-    }
-
     /* Reason fieldset & full-width radio pills */
     .reason-fieldset {
       border: none;
@@ -1807,36 +1777,29 @@
     <main class="unsub-main">
       <div class="unsub-card">
 
-        <!-- STATE A: Unsubscribe Form -->
-        <div id="unsubStateForm" class="is-hidden">
+        <!-- STATE A: Simple Unsubscribe Form (Editable Email + Optional Pre-fill) -->
+        <div id="unsubStateForm">
           <h1>Stop getting emails from MerakiMe</h1>
           <p class="unsub-subhead">
-            Confirm below and we'll take you off our list. The question after the email is optional.
+            Enter or confirm your email below and we'll take you off our list. The question after the email is optional.
           </p>
 
           <form id="unsubForm" novalidate>
             <input type="checkbox" name="botcheck" style="display: none;" tabindex="-1" autocomplete="off" />
 
-            <!-- Locked Email Field -->
+            <!-- Editable Email Field (Auto-fills if ?email= is in the link) -->
             <div class="form-group">
-              <label class="form-label" for="unsubEmail">Your email address</label>
-              <div class="readonly-input-wrap">
-                <input
-                  class="form-input form-input--locked"
-                  type="email"
-                  id="unsubEmail"
-                  name="email"
-                  readonly
-                  aria-readonly="true"
-                  required
-                  tabindex="-1"
-                />
-                <svg class="lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-              </div>
-              <p class="caption">Taken from the link in our email.</p>
+              <label class="form-label" for="unsubEmail">Your email address <span class="required-star">*</span></label>
+              <input
+                class="form-input"
+                type="email"
+                id="unsubEmail"
+                name="email"
+                placeholder="you@brokerage.com"
+                autocomplete="email"
+                required
+              />
+              <p class="caption" id="unsubEmailNote">Enter the email address where you received our message.</p>
             </div>
 
             <!-- Optional Reason Fieldset -->
@@ -1898,7 +1861,7 @@
               </div>
             </fieldset>
 
-            <!-- STATE D: Error message above button -->
+            <!-- Error message above button -->
             <div id="unsubError" class="form-status error unsub-error-box is-hidden" role="alert" aria-live="assertive"></div>
 
             <button type="submit" id="unsubSubmitBtn" class="btn-cta unsub-submit-btn">Unsubscribe me</button>
@@ -1906,18 +1869,7 @@
           </form>
         </div>
 
-        <!-- STATE B: Fallback (missing or invalid email) -->
-        <div id="unsubStateFallback" class="is-hidden">
-          <h1>This link looks incomplete</h1>
-          <p class="unsub-subhead">
-            We couldn't read your email address from this link. Just reply to our email with the word "unsubscribe" and we'll take you off our list.
-          </p>
-          <a id="fallbackMailtoBtn" class="btn-secondary" href="mailto:kiera@merakime.com?subject=Unsubscribe">
-            Email us to unsubscribe
-          </a>
-        </div>
-
-        <!-- STATE C: Confirmation + Optional Second-Shot Panel -->
+        <!-- STATE B: Confirmation + Optional Second-Shot Panel -->
         <div id="unsubStateConfirm" class="is-hidden" aria-live="polite">
           <h1 id="confirmHeading" tabindex="-1">Got it. We'll take you off our list.</h1>
           <p id="confirmBody" class="confirm-body"></p>
@@ -1961,17 +1913,17 @@
     /* ------------------------------------------------------------------------
        SHARED CONSTANTS (Adjust here as needed)
        ------------------------------------------------------------------------ */
-    const ACCESS_KEY = '088fbeea-2fef-46e6-9c66-d742cd16213f'; // MerakiMe-unsubscribe Web3Forms key
+    const ACCESS_KEY = "088fbeea-2fef-46e6-9c66-d742cd16213f"; // MerakiMe-unsubscribe Web3Forms key
     const UNSUBSCRIBE_PROMISE_DAYS = 2;                       // Must never exceed 10 business days
     const SAMPLE_TURNAROUND_DAYS = 2;                         // Business days to deliver free sample
-    const HOME_URL = 'https://merakime.com/';
-    const SUPPORT_EMAIL = 'kiera@merakime.com';
+    const HOME_URL = "https://merakime.com/";
+    const SUPPORT_EMAIL = "kiera@merakime.com";
 
     /* ------------------------------------------------------------------------
        ROUTE DETECTION: Switch to Unsubscribe View on /unsubscribe
        ------------------------------------------------------------------------ */
-    const cleanPath = window.location.pathname.replace(/\/+$/, '').toLowerCase();
-    const isUnsubscribeRoute = cleanPath === '/unsubscribe' || cleanPath === '/unsubscribe.html';
+    const cleanPath = window.location.pathname.replace(/\/+$/, "").toLowerCase();
+    const isUnsubscribeRoute = cleanPath === "/unsubscribe" || cleanPath === "/unsubscribe.html";
 
     if (isUnsubscribeRoute) {
       initUnsubscribePage();
@@ -1983,43 +1935,43 @@
        A. LANDING PAGE FORM HANDLER
        ------------------------------------------------------------------------ */
     function initLandingPageForm() {
-      const form = document.getElementById('merakimeForm');
-      const submitBtn = document.getElementById('submitBtn');
-      const formStatus = document.getElementById('formStatus');
+      const form = document.getElementById("merakimeForm");
+      const submitBtn = document.getElementById("submitBtn");
+      const formStatus = document.getElementById("formStatus");
       if (!form) return;
 
-      form.addEventListener('submit', async function (event) {
+      form.addEventListener("submit", async function (event) {
         event.preventDefault();
 
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending...';
-        formStatus.className = 'form-status';
-        formStatus.textContent = '';
+        submitBtn.textContent = "Sending...";
+        formStatus.className = "form-status";
+        formStatus.textContent = "";
 
         const formData = new FormData(form);
-        const fullName = (formData.get('name') || '').trim();
-        const firstName = fullName.split(' ')[0] || 'there';
+        const fullName = (formData.get("name") || "").trim();
+        const firstName = fullName.split(" ")[0] || "there";
 
         try {
-          const response = await fetch('https://api.web3forms.com/submit', {
-            method: 'POST',
+          const response = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
             body: formData
           });
           const result = await response.json();
 
           if (response.ok && result.success) {
-            formStatus.className = 'form-status success';
+            formStatus.className = "form-status success";
             formStatus.textContent = `Thanks, ${firstName}. We are building your sample now and will email it to you within ${SAMPLE_TURNAROUND_DAYS} business days.`;
             form.reset();
           } else {
-            throw new Error(result.message || 'Something went wrong.');
+            throw new Error(result.message || "Something went wrong.");
           }
         } catch (error) {
-          formStatus.className = 'form-status error';
-          formStatus.textContent = 'Oops — something went wrong sending your request. Please try again or email us directly.';
+          formStatus.className = "form-status error";
+          formStatus.textContent = "Oops — something went wrong sending your request. Please try again or email us directly.";
         } finally {
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Send my free sample';
+          submitBtn.textContent = "Send my free sample";
         }
       });
     }
@@ -2029,40 +1981,33 @@
        ------------------------------------------------------------------------ */
     function initUnsubscribePage() {
       // 1. Add noindex, nofollow meta tag & update browser title
-      const robotsMeta = document.createElement('meta');
-      robotsMeta.name = 'robots';
-      robotsMeta.content = 'noindex, nofollow';
+      const robotsMeta = document.createElement("meta");
+      robotsMeta.name = "robots";
+      robotsMeta.content = "noindex, nofollow";
       document.head.appendChild(robotsMeta);
-      document.title = 'Unsubscribe | Merakime Solutions';
+      document.title = "Unsubscribe | Merakime Solutions";
 
       // 2. Swap views
-      document.getElementById('landingView').classList.add('is-hidden');
-      document.getElementById('unsubscribeView').classList.remove('is-hidden');
+      document.getElementById("landingView").classList.add("is-hidden");
+      document.getElementById("unsubscribeView").classList.remove("is-hidden");
 
-      // 3. Parse URL parameters safely (preserving '+' in email addresses)
+      // 3. Read optional URL parameters (auto-fills email if present, stays editable either way)
       const params = new URLSearchParams(window.location.search);
-      const email = (params.get('email') || '').trim().replace(/ /g, '+');
-      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      const firstName = (params.get('name') || '').trim();
-      const market = (params.get('market') || '').trim();
-      const campaign = (params.get('campaign') || '').trim();
+      const urlEmail = (params.get("email") || "").trim().replace(/ /g, "+");
+      const firstName = (params.get("name") || "").trim();
+      const market = (params.get("market") || "").trim();
+      const campaign = (params.get("campaign") || "").trim();
 
-      const stateForm = document.getElementById('unsubStateForm');
-      const stateFallback = document.getElementById('unsubStateFallback');
-      const stateConfirm = document.getElementById('unsubStateConfirm');
+      const emailInput = document.getElementById("unsubEmail");
+      const emailNote = document.getElementById("unsubEmailNote");
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      // State B: Missing or invalid email
-      if (!emailOk) {
-        const mailtoBtn = document.getElementById('fallbackMailtoBtn');
-        mailtoBtn.href = `mailto:${SUPPORT_EMAIL}?subject=Unsubscribe`;
-        stateFallback.classList.remove('is-hidden');
-        return;
+      if (emailPattern.test(urlEmail)) {
+        emailInput.value = urlEmail;
+        emailNote.textContent = "Pre-filled from your email link. You can edit it if needed.";
       }
 
-      // State A: Valid email -> show form
-      stateForm.classList.remove('is-hidden');
-      document.getElementById('unsubEmail').value = email;
-      document.getElementById('unsubPromiseCopy').textContent =
+      document.getElementById("unsubPromiseCopy").textContent =
         `We'll take you off our list within ${UNSUBSCRIBE_PROMISE_DAYS} business days.`;
 
       const REASON_LABELS = {
@@ -2078,214 +2023,225 @@
       };
 
       const radioInputs = document.querySelectorAll('input[name="reason"]');
-      const otherWrap = document.getElementById('reasonOtherWrap');
-      const otherTextarea = document.getElementById('reasonOther');
+      const otherWrap = document.getElementById("reasonOtherWrap");
+      const otherTextarea = document.getElementById("reasonOther");
 
       // Handle radio selection styling + R9 textarea visibility
       radioInputs.forEach(function (radio) {
-        radio.addEventListener('change', function () {
-          document.querySelectorAll('.radio-pill').forEach(function (pill) {
-            pill.classList.remove('is-selected');
+        radio.addEventListener("change", function () {
+          document.querySelectorAll(".radio-pill").forEach(function (pill) {
+            pill.classList.remove("is-selected");
           });
           if (radio.checked) {
-            radio.closest('.radio-pill').classList.add('is-selected');
+            radio.closest(".radio-pill").classList.add("is-selected");
           }
 
-          if (radio.value === 'R9' && radio.checked) {
-            otherWrap.classList.remove('is-hidden');
+          if (radio.value === "R9" && radio.checked) {
+            otherWrap.classList.remove("is-hidden");
             otherTextarea.focus();
           } else {
-            otherWrap.classList.add('is-hidden');
-            otherTextarea.value = '';
+            otherWrap.classList.add("is-hidden");
+            otherTextarea.value = "";
           }
         });
       });
 
       // Handle Unsubscribe Submit
-      const unsubForm = document.getElementById('unsubForm');
-      const unsubSubmitBtn = document.getElementById('unsubSubmitBtn');
-      const unsubError = document.getElementById('unsubError');
+      const stateForm = document.getElementById("unsubStateForm");
+      const stateConfirm = document.getElementById("unsubStateConfirm");
+      const unsubForm = document.getElementById("unsubForm");
+      const unsubSubmitBtn = document.getElementById("unsubSubmitBtn");
+      const unsubError = document.getElementById("unsubError");
 
-      unsubForm.addEventListener('submit', async function (event) {
+      unsubForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
+        const submittedEmail = emailInput.value.trim();
+
+        // Validate email before sending
+        if (!emailPattern.test(submittedEmail)) {
+          unsubError.textContent = "Please enter a valid email address so we know which address to remove.";
+          unsubError.classList.remove("is-hidden");
+          emailInput.focus();
+          return;
+        }
+
         unsubSubmitBtn.disabled = true;
-        unsubSubmitBtn.textContent = 'Sending...';
-        unsubError.classList.add('is-hidden');
-        unsubError.textContent = '';
+        unsubSubmitBtn.textContent = "Sending...";
+        unsubError.classList.add("is-hidden");
+        unsubError.textContent = "";
 
         const chosenRadio = unsubForm.querySelector('input[name="reason"]:checked');
-        const reasonCode = chosenRadio ? chosenRadio.value : '';
-        const reasonLabel = reasonCode ? REASON_LABELS[reasonCode] : '';
-        const reasonOther = reasonCode === 'R9' ? otherTextarea.value.trim() : '';
+        const reasonCode = chosenRadio ? chosenRadio.value : "";
+        const reasonLabel = reasonCode ? REASON_LABELS[reasonCode] : "";
+        const reasonOther = reasonCode === "R9" ? otherTextarea.value.trim() : "";
 
         const formData = new FormData();
-        formData.append('access_key', ACCESS_KEY);
-        formData.append('subject', 'MerakiMe UNSUBSCRIBE request');
-        formData.append('from_name', 'MerakiMe-unsubscribe');
-        formData.append('form_type', 'unsubscribe');
-        formData.append('email', email);
-        formData.append('name', firstName);
-        formData.append('market', market);
-        formData.append('campaign', campaign);
-        formData.append('reason_code', reasonCode);
-        formData.append('reason_label', reasonLabel);
-        formData.append('reason_other', reasonOther);
-        formData.append('source', 'cold-email');
-        formData.append('submitted_at', new Date().toISOString());
-        formData.append('botcheck', '');
+        formData.append("access_key", ACCESS_KEY);
+        formData.append("subject", "MerakiMe UNSUBSCRIBE request");
+        formData.append("from_name", "MerakiMe-unsubscribe");
+        formData.append("form_type", "unsubscribe");
+        formData.append("email", submittedEmail);
+        formData.append("name", firstName);
+        formData.append("market", market);
+        formData.append("campaign", campaign);
+        formData.append("reason_code", reasonCode);
+        formData.append("reason_label", reasonLabel);
+        formData.append("reason_other", reasonOther);
+        formData.append("source", "cold-email");
+        formData.append("submitted_at", new Date().toISOString());
+        formData.append("botcheck", "");
 
         try {
-          const response = await fetch('https://api.web3forms.com/submit', {
-            method: 'POST',
+          const response = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
             body: formData
           });
           const result = await response.json();
 
           if (response.ok && result.success) {
-            showConfirmationState(email, firstName, market, campaign, reasonCode);
+            showConfirmationState(submittedEmail, firstName, market, campaign, reasonCode);
           } else {
-            throw new Error(result.message || 'Submit failed');
+            throw new Error(result.message || "Submit failed");
           }
         } catch (err) {
-          // State D: Error above button, form stays filled in
           unsubError.textContent =
             `Something went wrong. Please email ${SUPPORT_EMAIL} with the word "unsubscribe" and we'll remove you.`;
-          unsubError.classList.remove('is-hidden');
+          unsubError.classList.remove("is-hidden");
           unsubSubmitBtn.disabled = false;
-          unsubSubmitBtn.textContent = 'Unsubscribe me';
+          unsubSubmitBtn.textContent = "Unsubscribe me";
         }
       });
 
       function showConfirmationState(emailVal, nameVal, marketVal, campaignVal, reasonCode) {
-        stateForm.classList.add('is-hidden');
-        stateConfirm.classList.remove('is-hidden');
+        stateForm.classList.add("is-hidden");
+        stateConfirm.classList.remove("is-hidden");
 
-        const confirmHeading = document.getElementById('confirmHeading');
-        const confirmBody = document.getElementById('confirmBody');
-        const confirmSorry = document.getElementById('confirmSorry');
-        const confirmThanks = document.getElementById('confirmThanks');
+        const confirmHeading = document.getElementById("confirmHeading");
+        const confirmBody = document.getElementById("confirmBody");
+        const confirmSorry = document.getElementById("confirmSorry");
+        const confirmThanks = document.getElementById("confirmThanks");
 
         confirmBody.textContent =
           `We'll remove ${emailVal} from our list within ${UNSUBSCRIBE_PROMISE_DAYS} business days. You won't get any more emails from us after that.`;
 
-        if (reasonCode === 'R8') {
-          confirmSorry.classList.remove('is-hidden');
+        if (reasonCode === "R8") {
+          confirmSorry.classList.remove("is-hidden");
         }
-        if (reasonCode === 'R7' || reasonCode === 'R8' || reasonCode === 'R9') {
-          confirmThanks.classList.remove('is-hidden');
+        if (reasonCode === "R7" || reasonCode === "R8" || reasonCode === "R9") {
+          confirmThanks.classList.remove("is-hidden");
         }
 
         // Move focus to confirmation heading for accessibility
         confirmHeading.focus();
 
         // Second-shot panel for R1 to R6
-        const marketText = marketVal || 'your market';
+        const marketText = marketVal || "your market";
         const SECOND_SHOTS = {
           R1: {
             message: `You already know how much time it takes. We run that same sweep across Facebook groups, X, LinkedIn, Instagram, TikTok, Reddit and Threads, and every lead links back to the original post. A free sample for ${marketText} shows what you'd get back.`,
-            type: 'sample',
-            buttonLabel: 'Send me the free sample'
+            type: "sample",
+            buttonLabel: "Send me the free sample"
           },
           R2: {
             message: `Fair enough. We don't send general social media leads. We only include people who publicly said they're moving to or selling in ${marketText}, with a link to the post so you can judge for yourself.`,
-            type: 'sample',
-            buttonLabel: 'Send me the free sample'
+            type: "sample",
+            buttonLabel: "Send me the free sample"
           },
           R3: {
             message: `Good problem to have. Realtors usually use us alongside referrals and past clients, not instead of them. If your pipeline slows down, you can see what a lead looks like any time.`,
-            type: 'link',
-            buttonLabel: 'See what a lead looks like'
+            type: "link",
+            buttonLabel: "See what a lead looks like"
           },
           R4: {
             message: `We agree that bought lists are a bad bet. These aren't purchased: each lead is one person's public post or comment, with the link so you can check it yourself, and we replace any lead that isn't a fit.`,
-            type: 'link',
-            buttonLabel: 'See what a lead looks like'
+            type: "link",
+            buttonLabel: "See what a lead looks like"
           },
           R5: {
             message: `That works. We're built to sit alongside other sources: one realtor per market, a flat fee per lead, no commission share, month-to-month. A free sample for ${marketText} costs nothing to compare.`,
-            type: 'sample',
-            buttonLabel: 'Send me the free sample'
+            type: "sample",
+            buttonLabel: "Send me the free sample"
           },
           R6: {
             message: `Understood. There's no ad spend, no commission share and no contract, and the sample is free, so you can judge the quality before spending anything.`,
-            type: 'sample',
-            buttonLabel: 'Send me the free sample'
+            type: "sample",
+            buttonLabel: "Send me the free sample"
           }
         };
 
         const shot = SECOND_SHOTS[reasonCode];
         if (!shot) return;
 
-        const secondShotWrap = document.getElementById('secondShotWrap');
-        const secondShotPanel = document.getElementById('secondShotPanel');
-        const secondShotMessage = document.getElementById('secondShotMessage');
-        const secondShotActionWrap = document.getElementById('secondShotActionWrap');
-        const secondShotError = document.getElementById('secondShotError');
+        const secondShotWrap = document.getElementById("secondShotWrap");
+        const secondShotPanel = document.getElementById("secondShotPanel");
+        const secondShotMessage = document.getElementById("secondShotMessage");
+        const secondShotActionWrap = document.getElementById("secondShotActionWrap");
+        const secondShotError = document.getElementById("secondShotError");
 
         secondShotMessage.textContent = shot.message;
-        secondShotActionWrap.textContent = '';
+        secondShotActionWrap.textContent = "";
 
-        if (shot.type === 'link') {
-          const link = document.createElement('a');
-          link.className = 'btn-secondary';
+        if (shot.type === "link") {
+          const link = document.createElement("a");
+          link.className = "btn-secondary";
           link.href = `${HOME_URL}#sample-lead`;
           link.textContent = shot.buttonLabel;
           secondShotActionWrap.appendChild(link);
         } else if (!marketVal) {
           // If market is missing, button becomes a plain link to the landing page form
-          const link = document.createElement('a');
-          link.className = 'btn-secondary';
+          const link = document.createElement("a");
+          link.className = "btn-secondary";
           link.href = `${HOME_URL}#sample-form`;
           link.textContent = shot.buttonLabel;
           secondShotActionWrap.appendChild(link);
         } else {
           // One-click sample request POST
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'btn-secondary';
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "btn-secondary";
           btn.textContent = shot.buttonLabel;
 
-          btn.addEventListener('click', async function () {
+          btn.addEventListener("click", async function () {
             btn.disabled = true;
-            btn.textContent = 'Sending...';
-            secondShotError.classList.add('is-hidden');
-            secondShotError.textContent = '';
+            btn.textContent = "Sending...";
+            secondShotError.classList.add("is-hidden");
+            secondShotError.textContent = "";
 
             const sampleData = new FormData();
-            sampleData.append('access_key', ACCESS_KEY);
-            sampleData.append('subject', 'FREE SAMPLE REQUEST (from unsubscribe page)');
-            sampleData.append('from_name', 'MerakiMe-unsubscribe');
-            sampleData.append('form_type', 'sample_request_from_unsubscribe');
-            sampleData.append('email', emailVal);
-            sampleData.append('name', nameVal);
-            sampleData.append('market', marketVal);
-            sampleData.append('campaign', campaignVal);
-            sampleData.append('reason_code', reasonCode);
-            sampleData.append('submitted_at', new Date().toISOString());
-            sampleData.append('botcheck', '');
+            sampleData.append("access_key", ACCESS_KEY);
+            sampleData.append("subject", "FREE SAMPLE REQUEST (from unsubscribe page)");
+            sampleData.append("from_name", "MerakiMe-unsubscribe");
+            sampleData.append("form_type", "sample_request_from_unsubscribe");
+            sampleData.append("email", emailVal);
+            sampleData.append("name", nameVal);
+            sampleData.append("market", marketVal);
+            sampleData.append("campaign", campaignVal);
+            sampleData.append("reason_code", reasonCode);
+            sampleData.append("submitted_at", new Date().toISOString());
+            sampleData.append("botcheck", "");
 
             try {
-              const res = await fetch('https://api.web3forms.com/submit', {
-                method: 'POST',
+              const res = await fetch("https://api.web3forms.com/submit", {
+                method: "POST",
                 body: sampleData
               });
               const json = await res.json();
 
               if (res.ok && json.success) {
-                secondShotPanel.textContent = '';
-                const doneMsg = document.createElement('p');
-                doneMsg.className = 'second-shot-status';
+                secondShotPanel.textContent = "";
+                const doneMsg = document.createElement("p");
+                doneMsg.className = "second-shot-status";
                 doneMsg.textContent =
                   `Done. We'll email your sample within ${SAMPLE_TURNAROUND_DAYS} business days. That's the only email you'll get from us.`;
                 secondShotPanel.appendChild(doneMsg);
               } else {
-                throw new Error(json.message || 'Failed');
+                throw new Error(json.message || "Failed");
               }
             } catch (e) {
               secondShotError.textContent =
-                'Something went wrong. Reply to our email with the word "sample" and we'll send it over.';
-              secondShotError.classList.remove('is-hidden');
+                `Something went wrong. Reply to our email with the word "sample" and we'll send it over.`;
+              secondShotError.classList.remove("is-hidden");
               btn.disabled = false;
               btn.textContent = shot.buttonLabel;
             }
@@ -2294,7 +2250,7 @@
           secondShotActionWrap.appendChild(btn);
         }
 
-        secondShotWrap.classList.remove('is-hidden');
+        secondShotWrap.classList.remove("is-hidden");
       }
     }
   </script>
